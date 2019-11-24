@@ -210,7 +210,7 @@ public class ExprGen{
 
     public String visit(AST.loop expr, String class_name, AST.method method, List<String> changedformals,
             PrintWriter out, List<String> blocks) {
-        int loopcount = ++loops;
+        int loopcount = ++mygen.loops;
         out.println("\tbr label %loop.cond" + loopcount);
         out.println("loop.cond" + loopcount + ":");
         blocks.add("loop.cond" + loopcount);
@@ -278,7 +278,7 @@ public class ExprGen{
         out.println("if.else" + mygen.ifs + ":");
         blocks.add("if.else" + mygen.ifs);
         String funcname = "@_ZN" + expr.typeid.length() + expr.typeid + expr.name.length() + expr.name;
-        ClassIR table2 = mygen.classtable.irTable.get(reverseParseType(mygen.reverseParseTypeValue(clr)));
+        ClassIR table2 = mygen.classtable.irTable.get(mygen.reverseParseType(mygen.reverseParseTypeValue(clr)));
         while (!mygen.reverseParseTypeValue(clr).equals(mygen.parseType(expr.typeid))) {
             String par = mygen.parseType(table2.parent);
             par = par.substring(0, par.length() - 1);
