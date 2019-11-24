@@ -36,6 +36,9 @@ public class AST{
 		String getString(String space){
 			return "";
 		};
+		String getname(){
+			return "";
+		};
 	}
 	public static class no_expr extends expression {
 		public no_expr(int l){
@@ -43,6 +46,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_no_expr\n"+space+": "+type;
+		}
+		String getname(){
+			return "no_expr";
 		}
 	}
 	public static class bool_const extends expression{
@@ -54,6 +60,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_bool\n"+space+sp+(value?"1":"0")+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "bool_const";
+		}
 	}
 	public static class string_const extends expression{
 		public String value;
@@ -63,6 +72,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_string\n"+space+sp+"\""+escapeSpecialCharacters(value)+"\""+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "string_const";
 		}
 	}
 
@@ -75,6 +87,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_int\n"+space+sp+value+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "int_const";
+		}
 	}
 
 	public static class object extends expression{
@@ -86,6 +101,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_object\n"+space+sp+name+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "object";
+		}
 	}
 	public static class comp extends expression{
 		public expression e1;
@@ -95,6 +113,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_comp\n"+e1.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "comp";
 		}
 	}
 	public static class eq extends expression{
@@ -107,6 +128,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_eq\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "eq";
 		}
 	}
 	
@@ -122,6 +146,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_leq\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "leq";
+		}
 	}
 
 	public static class lt extends expression{
@@ -135,6 +162,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_lt\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "lt";
+		}
 	}
 	public static class neg extends expression{
 		public expression e1;
@@ -144,6 +174,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_neg\n"+e1.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "neg";
 		}
 	}
 	public static class divide extends expression{
@@ -157,6 +190,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_divide\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "divide";
+		}
 	}
 	public static class mul extends expression{
 		public expression e1;
@@ -168,6 +204,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_mul\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "mul";
 		}
 	}
 	public static class sub extends expression{
@@ -181,6 +220,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_sub\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "sub";
+		}
 	}
 	public static class plus extends expression{
 		public expression e1;
@@ -193,6 +235,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_plus\n"+e1.getString(space+sp)+"\n"+e2.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "plus";
+		}
 	}
 	public static class isvoid extends expression{
 		public expression e1;
@@ -203,6 +248,9 @@ public class AST{
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_isvoid\n"+e1.getString(space+sp)+"\n"+space+": "+type;
 		}
+		String getname(){
+			return "isvoid";
+		}
 	}
 	public static class new_ extends expression{
 		public String typeid;
@@ -212,6 +260,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_new\n"+space+sp+typeid+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "new_";
 		}
 	}
 	public static class assign extends expression{
@@ -224,6 +275,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_assign\n"+space+sp+name+"\n"+e1.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "assign";
 		}
 	}
 	public static class block extends expression{
@@ -240,6 +294,9 @@ public class AST{
 			str+=space+": "+type;
 			return str;
 		}
+		String getname(){
+			return "block";
+		}
 	}
 	public static class loop extends expression{
 		public expression predicate;
@@ -251,6 +308,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_loop\n"+predicate.getString(space+sp)+"\n"+body.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "loop";
 		}
 	}
 	public static class cond extends expression{
@@ -265,6 +325,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_cond\n"+predicate.getString(space+sp)+"\n"+ifbody.getString(space+sp)+"\n"+elsebody.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "cond";
 		}
 	}
 	public static class let extends expression{
@@ -281,6 +344,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_let\n"+space+sp+name+"\n"+space+sp+typeid+"\n"+value.getString(space+sp)+"\n"+body.getString(space+sp)+"\n"+space+": "+type;
+		}
+		String getname(){
+			return "let";
 		}
 	}
 	public static class dispatch extends expression{
@@ -301,6 +367,9 @@ public class AST{
 			}
 			str+=space+sp+")\n"+space+": "+type;
 			return str;
+		}
+		String getname(){
+			return "dispatch";
 		}
 	}
 	public static class static_dispatch extends expression{
@@ -323,7 +392,10 @@ public class AST{
                         }
                         str+=space+sp+")\n"+space+": "+type;
                         return str;
-                }
+				}
+				String getname(){
+					return "static_dispatch";
+				}
         }
 	public static class typcase extends expression{
 		public expression predicate;
@@ -341,6 +413,9 @@ public class AST{
 			str += space+": "+type;
 			return str;
 		}
+		String getname(){
+			return "typcase";
+		}
 	}
 	public static class branch extends ASTNode {
 		public String name;
@@ -354,6 +429,9 @@ public class AST{
 		}
 		String getString(String space){
 			return space+"#"+lineNo+"\n"+space+"_branch\n"+space+sp+name+"\n"+space+sp+type+"\n"+value.getString(space+sp);
+		}
+		String getname(){
+			return "branch";
 		}
 	}
 	public static class formal extends ASTNode {

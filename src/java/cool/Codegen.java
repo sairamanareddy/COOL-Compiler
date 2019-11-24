@@ -368,122 +368,141 @@ public class Codegen{
 	}
 	public String printexpr(String class_name, AST.method method, AST.expression expr, List<String> changedformals, List<String> blocks, PrintWriter out) {
 		ClassIR ci = classtable.irTable.get(class_name);
-		if(expr instanceof AST.bool_const){
-			//Bool const
-			AST.bool_const temp = (AST.bool_const) expr;
-			return "i32 " + (temp.value ? 1 : 0);
-		}
-		else if(expr instanceof AST.string_const){
-			//String const
-			AST.string_const temp = (AST.string_const) expr;
-			return visit(temp, out);
-		}
-		else if(expr instanceof AST.int_const) {
-			//Int const
-			AST.int_const temp = (AST.int_const) expr;
-			return "i32 " + temp.value;
-		}
-		else if(expr instanceof AST.object){
-			AST.object temp = (AST.object) expr;
-			return visit(temp, class_name, ci, method, changedformals, out);
-		}
-		else if(expr instanceof AST.comp){
-			AST.comp temp = (AST.comp) expr;
-			String op = printexpr(class_name, method, temp, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = sub nsw i32 1, " + op.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.eq){
-			AST.eq temp = (AST.eq) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = icmp eq i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.leq){
-			AST.leq temp = (AST.leq) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = icmp sle i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.lt){
-			AST.lt temp = (AST.lt) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = icmp slt i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.neg){
-			AST.neg temp = (AST.neg) expr;
-			String op = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = sub nsw i32 0, " + op.substring(4));
-		}
-		else if(expr instanceof AST.divide){
-			String op1 = printexpr(class_name, method, expr, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, expr, changedformals, blocks, out);
-			AST.divide temp = (AST.divide) expr;
-			return visit(temp, blocks, out, op1, op2);
-		}
-		else if(expr instanceof AST.mul){
-			AST.mul temp = (AST.mul) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = mul nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.sub){
-			AST.sub temp = (AST.sub) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = sub nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.plus){
-			AST.plus temp = (AST.plus) expr;
-			String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = add nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.isvoid){
-			AST.isvoid temp = (AST.isvoid) expr;
-			String op = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			out.println("\t%" + (++vars) + " = icmp eq " + op + ", null");
-			return "i32 %" + vars;
-		}
-		else if(expr instanceof AST.new_){
-			AST.new_ temp = (AST.new_) expr;
-			return visit(temp, out);
-		}
-		else if(expr instanceof AST.assign){
-			AST.assign temp = (AST.assign)expr;
-			String lvalue = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
-			return visit(temp, ci, lvalue, class_name, method, changedformals, out);
-		}
-		else if(expr instanceof AST.block){
-			AST.block temp = (AST.block) expr;
-			String return_var = "";
-			for(AST.expression e : temp.l1){
-				return_var = printexpr(class_name, method, e, changedformals, blocks, out);
+		switch(expr.getname()){
+			case "bool_const":
+			{	//Bool const
+				AST.bool_const temp = (AST.bool_const) expr;
+				return "i32 " + (temp.value ? 1 : 0);
 			}
-			return return_var;
-		}
-		else if(expr instanceof AST.loop){
-			AST.loop temp = (AST.loop) expr;
-			return visit(temp, class_name, method, changedformals, out, blocks);
-		}
-		else if(expr instanceof AST.cond){
-			AST.cond temp = (AST.cond) expr;
-			return visit(temp, class_name, method, blocks, changedformals, out);
-		}
-		else if(expr instanceof AST.static_dispatch){
+			case "string_const":
+			{
+				//String const
+				AST.string_const temp = (AST.string_const) expr;
+				return visit(temp, out);
+			}
+			case "int_const":
+			{	//Int const
+				AST.int_const temp = (AST.int_const) expr;
+				return "i32 " + temp.value;
+			}
+			case "object":
+			{
+				AST.object temp = (AST.object) expr;
+				return visit(temp, class_name, ci, method, changedformals, out);
+			}
+			case "comp":
+			{
+				AST.comp temp = (AST.comp) expr;
+				String op = printexpr(class_name, method, temp, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = sub nsw i32 1, " + op.substring(4));
+				return "i32 %" + vars;
+			}
+			case "eq":
+			{
+				AST.eq temp = (AST.eq) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = icmp eq i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "leq":
+			{
+				AST.leq temp = (AST.leq) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = icmp sle i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "lt":
+			{
+				AST.lt temp = (AST.lt) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = icmp slt i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "neg":
+			{
+				AST.neg temp = (AST.neg) expr;
+				String op = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = sub nsw i32 0, " + op.substring(4));
+				return "";
+			}
+			case "divide":
+			{	
+				AST.divide temp = (AST.divide) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				return visit(temp, blocks, out, op1, op2);
+			}
+			case "mul":
+			{
+				AST.mul temp = (AST.mul) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = mul nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "sub":
+			{
+				AST.sub temp = (AST.sub) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = sub nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "plus":
+			{
+				AST.plus temp = (AST.plus) expr;
+				String op1 = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				String op2 = printexpr(class_name, method, temp.e2, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = add nsw i32 " + op1.substring(4) + ", " + op2.substring(4));
+				return "i32 %" + vars;
+			}
+			case "isvoid":
+			{
+				AST.isvoid temp = (AST.isvoid) expr;
+				String op = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				out.println("\t%" + (++vars) + " = icmp eq " + op + ", null");
+				return "i32 %" + vars;
+			}
+			case "new_":
+			{
+				AST.new_ temp = (AST.new_) expr;
+				return visit(temp, out);
+			}
+			case "temp":
+			{
+				AST.assign temp = (AST.assign)expr;
+				String lvalue = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
+				return visit(temp, ci, lvalue, class_name, method, changedformals, out);
+			}
+			case "block":
+			{
+				AST.block temp = (AST.block) expr;
+				String return_var = "";
+				for(AST.expression e : temp.l1){
+					return_var = printexpr(class_name, method, e, changedformals, blocks, out);
+				}
+				return return_var;
+			}
+			case "loop":
+			{
+				AST.loop temp = (AST.loop) expr;
+				return visit(temp, class_name, method, changedformals, out, blocks);
+			}
+			case "cond":
+			{
+				AST.cond temp = (AST.cond) expr;
+				return visit(temp, class_name, method, blocks, changedformals, out);
+			}
+			case "static_dispatch":
+			{
 			AST.static_dispatch temp = (AST.static_dispatch) expr;
 			return visit(temp, class_name, method, blocks, changedformals, out);
-		}
-		else{
-			System.err.println("Reached unreachable state. Exiting!");
-			System.exit(1);
+			}
+			default:
+			System.out.println("Error!");
 		}
 		return "";
 	}
