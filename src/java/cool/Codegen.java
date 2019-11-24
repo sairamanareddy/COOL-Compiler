@@ -4,15 +4,17 @@ import java.io.PrintWriter;
 import java.util.*;
 
 public class Codegen{
-	ClassIRTable classtable = new ClassIRTable();
-	int vars=0;
-	int loops=0;
-	int ifs=0;
-	int strings=0;
-	String totalStrings="";
-	String mainReturnType="i32";
+	public ClassIRTable classtable = new ClassIRTable();
+	public int vars=0;
+	public int loops=0;
+	public int ifs=0;
+	public int strings=0;
+	public String totalStrings="";
+	public String mainReturnType="i32";
+	public ExprGen egen;
 	public Codegen(AST.program program, PrintWriter out){
 		//Write Code generator code here
+		egen = new ExprGen(this);
 		printHeaders(out);
 		genCodeClasses(program.classes, out);
 		printMainFunc(out);
@@ -304,8 +306,6 @@ public class Codegen{
 		ClassIR temp = cur;
 		
 	    while (!reverseParseTypeValue(prev).equals(parseType("Object"))) {
-			// debug only
-			System.out.println(temp.parent);
 			String par = parseType(temp.parent);
 			par = par.substring(0, par.length()-1);
 			String next = reverseParseTypeValue(prev);
@@ -471,7 +471,7 @@ public class Codegen{
 				AST.new_ temp = (AST.new_) expr;
 				return visit(temp, out);
 			}
-			case "temp":
+			case "assign":
 			{
 				AST.assign temp = (AST.assign)expr;
 				String lvalue = printexpr(class_name, method, temp.e1, changedformals, blocks, out);
@@ -502,7 +502,8 @@ public class Codegen{
 			return visit(temp, class_name, method, blocks, changedformals, out);
 			}
 			default:
-			System.out.println("Error!");
+				System.out.println(expr.getname());
+				break;
 		}
 		return "";
 	}
@@ -659,7 +660,6 @@ public class Codegen{
 		out.println("\t%" + (++vars) + " = call " + parseType(expr.type) + " " + funcname + "(" + actstr + ")");
 		return parseType(expr.type) + " %" + vars;
 	}
-
 	public String visit(AST.object expr, String class_name, ClassIR ci, AST.method method, List<String> changedformals, PrintWriter out){
 		int atr = ci.aList.indexOf(expr.name);
 		for(AST.formal f : method.formals){
@@ -683,7 +683,7 @@ public class Codegen{
 		out.println("\t%"+(++vars)+" = load "+parseType(expr.type)+", "+parseType(expr.type)+"* %"+(vars-1)+", align 4");
 		return parseType(expr.type)+" %"+vars;
 	}
-	String reverseParseType(String t){
+	public String reverseParseType(String t){
 		if (t.equals("i32")) {
 			System.out.println("I will never come here reverseParseType");
 			return "Int";
